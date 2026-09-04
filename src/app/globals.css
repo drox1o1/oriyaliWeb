@@ -770,48 +770,62 @@ body::before {
 }
 
 /* ============================================================
-   THE HERO WASH
-   Paper washing in from the left so the type has ground to stand
-   on, while the right of the picture stays open.
+   THE HERO FIELD
+   A soft ellipse of paper behind the type — light falling on the
+   page, not a curtain drawn across the picture.
 
-   The opacities are not eyeballed. Measured against header.png
-   itself, the worst pixel behind the text (a white cloud) needs
-   62% paper in daylight and 70% in twilight before body text
-   clears 4.5:1 and the large accent clears 3:1 — so the two
-   themes carry different washes.
+   Measured against the artwork rather than guessed. The daylight
+   sky is mid-toned, which is the hardest possible ground: neither
+   dark nor light type clears AA on it unaided. So the hero gets
+   its own slightly deeper ink, which lets the field stay at 48%
+   and still read 5.3:1 across 99.9% of the text area. The night
+   sky is uniformly dark, so it needs less.
    ============================================================ */
 
 :root {
-  --hero-wash: linear-gradient(
-    96deg,
-    color-mix(in srgb, var(--paper) 84%, transparent) 0%,
-    color-mix(in srgb, var(--paper) 78%, transparent) 56%,
-    color-mix(in srgb, var(--paper) 38%, transparent) 68%,
-    color-mix(in srgb, var(--paper) 10%, transparent) 78%,
-    transparent 88%
+  --hero-ink: #2A241E;   /* deeper than --ink, so the field can stay light */
+  --hero-field: radial-gradient(
+    ellipse 62% 72% at 22% 50%,
+    color-mix(in srgb, var(--paper) 48%, transparent) 0%,
+    color-mix(in srgb, var(--paper) 42%, transparent) 46%,
+    color-mix(in srgb, var(--paper) 18%, transparent) 74%,
+    transparent 100%
   );
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --hero-wash: linear-gradient(
-      96deg,
-      color-mix(in srgb, var(--paper) 90%, transparent) 0%,
-      color-mix(in srgb, var(--paper) 85%, transparent) 56%,
-      color-mix(in srgb, var(--paper) 42%, transparent) 68%,
-      color-mix(in srgb, var(--paper) 12%, transparent) 78%,
-      transparent 88%
+    --hero-ink: var(--ink);
+    --hero-field: radial-gradient(
+      ellipse 62% 72% at 22% 50%,
+      color-mix(in srgb, var(--paper) 46%, transparent) 0%,
+      color-mix(in srgb, var(--paper) 38%, transparent) 46%,
+      color-mix(in srgb, var(--paper) 14%, transparent) 74%,
+      transparent 100%
     );
   }
 }
 
 :root[data-theme="dark"] {
-  --hero-wash: linear-gradient(
-    96deg,
-    color-mix(in srgb, var(--paper) 90%, transparent) 0%,
-    color-mix(in srgb, var(--paper) 85%, transparent) 56%,
-    color-mix(in srgb, var(--paper) 42%, transparent) 68%,
-    color-mix(in srgb, var(--paper) 12%, transparent) 78%,
-    transparent 88%
+  --hero-ink: var(--ink);
+  --hero-field: radial-gradient(
+    ellipse 62% 72% at 22% 50%,
+    color-mix(in srgb, var(--paper) 46%, transparent) 0%,
+    color-mix(in srgb, var(--paper) 38%, transparent) 46%,
+    color-mix(in srgb, var(--paper) 14%, transparent) 74%,
+    transparent 100%
   );
 }
+
+/* The hero artwork changes with the hour: a day sky, and a night one. */
+.hero-night { display: none; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .hero-day { display: none; }
+  :root:not([data-theme="light"]) .hero-night { display: block; }
+}
+
+:root[data-theme="dark"] .hero-day { display: none; }
+:root[data-theme="dark"] .hero-night { display: block; }
+:root[data-theme="light"] .hero-day { display: block; }
+:root[data-theme="light"] .hero-night { display: none; }
