@@ -1,12 +1,17 @@
 "use client";
 
-import { useId, useState } from "react";
-import { Aura } from "@/components/Aura";
-import { describeAura } from "@/lib/aura";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { BotanicalAura } from "@/components/BotanicalAura";
 
 const MOOD_WORDS = ["Flat", "Low", "Heavy", "Getting there", "Steady", "Clear"];
 const ENERGY_WORDS = ["Empty", "Running low", "Enough", "Steady", "Full"];
-const EDGE_WORDS = ["Still", "A little raw", "Short fuse", "Everything grates", "Storm"];
+const EDGE_WORDS = [
+  "Still",
+  "A little raw",
+  "Short fuse",
+  "Everything grates",
+  "Storm",
+];
 
 const word = (list: string[], v: number) =>
   list[Math.min(list.length - 1, Math.floor(v * list.length))];
@@ -24,7 +29,45 @@ export function AuraTaste() {
   const [mood, setMood] = useState(0.34);
   const [energy, setEnergy] = useState(0.3);
   const [edge, setEdge] = useState(0.68);
-  const [touched, setTouched] = useState(false);
+  const [drawn, setDrawn] = useState({
+    mood: 0.34,
+    energy: 0.3,
+    turbulence: 0.68,
+  });
+  const current = useRef(drawn);
+  useEffect(() => {
+    const target = { mood, energy, turbulence: edge };
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      document.documentElement.dataset.motion === "off"
+    ) {
+      current.current = target;
+      setDrawn(target);
+      return;
+    }
+    let frame = 0;
+    let previous = performance.now();
+    const tick = (now: number) => {
+      const blend = 1 - Math.exp(-Math.min(now - previous, 64) / 95);
+      previous = now;
+      const old = current.current;
+      const next = {
+        mood: old.mood + (mood - old.mood) * blend,
+        energy: old.energy + (energy - old.energy) * blend,
+        turbulence: old.turbulence + (edge - old.turbulence) * blend,
+      };
+      const settled =
+        Math.abs(next.mood - mood) +
+          Math.abs(next.energy - energy) +
+          Math.abs(next.turbulence - edge) <
+        0.002;
+      current.current = settled ? target : next;
+      setDrawn(current.current);
+      if (!settled) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [mood, energy, edge]);
 
   const moodId = useId();
   const energyId = useId();
@@ -35,21 +78,15 @@ export function AuraTaste() {
   return (
     <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:items-center md:gap-14">
       {/* The drawing */}
-      <div className="ori-paper-card flex flex-col items-center justify-center px-6 py-10 md:py-14">
-        <Aura
-          input={{ mood, energy, turbulence: edge }}
-          seed={4711}
-          animate={!touched}
-          className="h-56 w-56 md:h-72 md:w-72"
-          decorative
-        />
+      <div className="aura-studio">
+        <BotanicalAura input={drawn} />
         <p className="mt-6 text-center font-[family-name:var(--font-hand)] text-[1.25rem] leading-snug text-ink">
           {hard
             ? "This is what a hard day looks like here."
             : "This is what a steadier day looks like here."}
         </p>
         <p aria-live="polite" className="sr-only">
-          {describeAura(mood, energy, edge)}
+          {`A coloured-pencil flower: ${energy < 0.35 ? "gently folded" : energy > 0.7 ? "fully open" : "opening"} petals, ${mood < 0.5 ? "soft mauve and blush" : "warm rose and apricot"} colour, and ${edge > 0.6 ? "a slightly restless" : "a quiet"} pencil flicker.`}
         </p>
       </div>
 
@@ -62,31 +99,61 @@ export function AuraTaste() {
           Move these, and watch the day get drawn.
         </h3>
         <p className="mt-4 text-[1.02rem] leading-relaxed text-ink-soft">
-          This is the check-in from the app, running here in your browser. Nothing is
-          submitted, saved or counted.
+          This is the check-in from the app, running here in your browser.
+          Nothing is submitted, saved or counted.
         </p>
 
+        <div className="aura-presets" aria-label="Try a day">
+          {[
+            { name: "A quiet day", m: 0.78, e: 0.6, t: 0.16 },
+            { name: "A full day", m: 0.9, e: 0.96, t: 0.3 },
+            { name: "A hard day", m: 0.24, e: 0.28, t: 0.85 },
+          ].map((p) => (
+            <button
+              type="button"
+              key={p.name}
+              aria-pressed={
+                Math.abs(mood - p.m) < 0.01 &&
+                Math.abs(energy - p.e) < 0.01 &&
+                Math.abs(edge - p.t) < 0.01
+              }
+              onClick={() => {
+                setMood(p.m);
+                setEnergy(p.e);
+                setEdge(p.t);
+              }}
+            >
+              {p.name}
+            </button>
+          ))}
+        </div>
         <div className="mt-8 space-y-7">
           <Slider
             id={moodId}
             label="Mood"
             value={mood}
             display={word(MOOD_WORDS, mood)}
-            onChange={(v) => { setMood(v); setTouched(true); }}
+            onChange={(v) => {
+              setMood(v);
+            }}
           />
           <Slider
             id={energyId}
             label="Energy"
             value={energy}
             display={word(ENERGY_WORDS, energy)}
-            onChange={(v) => { setEnergy(v); setTouched(true); }}
+            onChange={(v) => {
+              setEnergy(v);
+            }}
           />
           <Slider
             id={edgeId}
             label="Irritability"
             value={edge}
             display={word(EDGE_WORDS, edge)}
-            onChange={(v) => { setEdge(v); setTouched(true); }}
+            onChange={(v) => {
+              setEdge(v);
+            }}
           />
         </div>
 
@@ -128,6 +195,7 @@ function Slider({
         value={Math.round(value * 100)}
         aria-valuetext={display}
         onChange={(e) => onChange(Number(e.target.value) / 100)}
+        style={{ "--slider-fill": `${value * 100}%` } as CSSProperties}
         className="ori-slider h-11 w-full cursor-pointer"
       />
     </div>

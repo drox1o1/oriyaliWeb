@@ -38,23 +38,16 @@ export function Reveal({
     if (!el || prefersReducedMotion() || !isBelowTheFold(el)) return;
 
     let stop: (() => void) | undefined;
+    let cancelAnimation: (() => void) | undefined;
     let cancelled = false;
 
-    /* Safety net. Content must never be stuck invisible because an observer
-       never fired or a chunk never arrived — reveal it regardless. */
-    const failsafe = window.setTimeout(() => {
+    const finishForPause = () => {
+      if (document.documentElement.dataset.motion !== "off") return;
+      cancelAnimation?.();
       el.style.opacity = "";
       el.style.transform = "";
-      el.style.willChange = "";
-    }, 4000);
-
-    const settle = () => {
-      window.clearTimeout(failsafe);
     };
-
-    el.style.opacity = "0";
-    el.style.transform = `translateY(${y}px)`;
-    el.style.willChange = "opacity, transform";
+    window.addEventListener("oriyali:motion", finishForPause);
 
     void (async () => {
       const { animate, inView } = await import("motion").catch(() => ({
@@ -66,16 +59,22 @@ export function Reveal({
       stop = inView(
         el,
         () => {
-          animate(
+          if (document.documentElement.dataset.motion === "off") return;
+          const animation = animate(
             el,
-            { opacity: [0, 1], transform: [`translateY(${y}px)`, "translateY(0px)"] },
+            {
+              opacity: [0, 1],
+              transform: [`translateY(${y}px)`, "translateY(0px)"],
+            },
             { duration: 0.85, delay, ease: [...SETTLE] },
-          ).then(() => {
+          );
+          cancelAnimation = () => animation.stop();
+          void animation.then(() => {
             el.style.willChange = "";
           });
-          settle();
+
           // Once it has arrived it stays arrived.
-          return () => {};
+          return;
         },
         { amount: 0.12 },
       );
@@ -83,7 +82,8 @@ export function Reveal({
 
     return () => {
       cancelled = true;
-      window.clearTimeout(failsafe);
+      window.removeEventListener("oriyali:motion", finishForPause);
+      cancelAnimation?.();
       stop?.();
       // If the import never resolved, don't leave anything invisible.
       el.style.opacity = "";

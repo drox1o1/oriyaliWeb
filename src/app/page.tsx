@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Aura } from "@/components/Aura";
+import { BotanicalAura } from "@/components/BotanicalAura";
 import { AuraTaste } from "@/components/AuraTaste";
 import { CycleExplainer } from "@/components/CycleExplainer";
 import { DrspReport } from "@/components/DrspReport";
@@ -12,6 +12,7 @@ import { Illustration } from "@/components/Illustration";
 import { RESTING_AURA } from "@/lib/aura";
 import { StructuredData } from "@/components/StructuredData";
 import { Hero } from "@/components/Hero";
+import { RecordSketch } from "@/components/RecordSketch";
 
 /**
  * One continuous spread. Every section sits on the same four-column grid —
@@ -68,11 +69,9 @@ export default function Home() {
         </div>
 
         <div className="col-aside self-start md:-mt-6">
-          <Aura
+          <BotanicalAura
             input={RESTING_AURA}
-            seed={1201}
             className="mx-auto block h-56 w-56 sm:h-72 sm:w-72 md:mx-0 md:h-auto md:w-full"
-            decorative
           />
         </div>
       </section>
@@ -168,6 +167,10 @@ export default function Home() {
           title="Why a record is the thing that finally works."
         />
 
+        <div className="col-body self-center">
+          <RecordSketch variant="journal" />
+        </div>
+
         <Sidenote className="col-aside self-start md:mt-2 md:border-l md:border-[var(--hairline)] md:pl-5">
           <span className="ori-kicker mb-2 block">Sources</span>
           Diagnosis delay: IAPMD Global Survey of Premenstrual Disorders &mdash; survey data,
@@ -208,6 +211,10 @@ export default function Home() {
             &mdash; not a memory, not a summary, but a rating made on the day. The standard form
             for it is the DRSP, the Daily Record of Severity of Problems. It looks like this.
           </p>
+        </div>
+
+        <div className="col-aside self-end">
+          <RecordSketch variant="cycles" />
         </div>
 
         <Reveal className="col-wide mt-6" y={20}>

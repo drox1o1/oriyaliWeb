@@ -3,6 +3,7 @@ import { Newsreader, Hanken_Grotesk, Shantell_Sans } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
+import { PageMotion } from "@/components/motion/PageMotion";
 
 /* Self-hosted at build time by next/font — no runtime request to Google. */
 /* Preloaded: the two faces the first screen paints in. 300 for the display
@@ -112,9 +113,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="ori-skip">
           Skip to the main content
         </a>
+        <PageMotion>
         <SiteHeader />
         <main id="main">{children}</main>
         <SiteFooter />
+        </PageMotion>
       </body>
     </html>
   );
