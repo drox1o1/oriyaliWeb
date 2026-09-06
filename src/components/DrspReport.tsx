@@ -37,6 +37,11 @@ const SEVERITY_WORDS = ["", "Not at all", "Minimal", "Mild", "Moderate", "Severe
 export function DrspReport() {
   return (
     <figure className="m-0">
+      {/* The report is a clinical document at a clinical width: 42rem of it,
+          which no phone has. So it scrolls inside its own frame, with a soft
+          right edge and a line saying so, rather than being squeezed into
+          something a clinician would not recognise. */}
+      <div className="ori-scroll-frame" style={{ "--frame-edge": "#FFFFFF" } as React.CSSProperties}>
       <div className="ori-scroll-x rounded-[14px] border border-[var(--drsp-line)] bg-drsp-bg" style={{ colorScheme: "light" }}>
         <div className="min-w-[42rem] p-6 md:p-8">
           {/* Header — the one trace of the brand. */}
@@ -137,6 +142,13 @@ export function DrspReport() {
           </p>
         </div>
       </div>
+      </div>
+      <p className="ori-scroll-hint">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M3 10h14M12 5l5 5-5 5" />
+        </svg>
+        Scroll sideways to read the whole cycle
+      </p>
       <figcaption className="mt-4 text-[0.92rem] leading-relaxed text-ink-soft">
         An illustration of the format, with sample data. This is what &ldquo;proof&rdquo; looks like
         in a consultation: a pattern, dated, recorded before the fact rather than remembered

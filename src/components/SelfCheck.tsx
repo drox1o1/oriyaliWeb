@@ -141,16 +141,25 @@ export function SelfCheck() {
           <h3 className="mt-3 font-[family-name:var(--font-display)] text-[1.95rem] leading-[1.15] text-ink md:text-[2.4rem]">
             Twenty-one questions, about four minutes, just for you.
           </h3>
-          <p className="mt-5 text-[1.05rem] leading-relaxed text-ink-soft">
-            These are the questions a doctor would use to decide whether what you live
-            through each month is worth investigating. They come from the PSST &mdash; a real,
-            published screening tool &mdash; not from us.
-          </p>
+          {/* The text of each line is wrapped, because a flex row treats every
+              child — including each run of bare text either side of an <em> —
+              as its own item, and then puts the gap between all of them. */}
           <ul className="mt-6 space-y-3 text-[1rem] leading-relaxed text-ink-soft">
-            <li className="flex gap-3"><Tick /> Answer for a typical <em>bad</em> week, not today.</li>
-            <li className="flex gap-3"><Tick /> There is no timer and no score to beat.</li>
-            <li className="flex gap-3"><Tick /> Your answers are worked out in this browser and are never sent, saved or stored &mdash; not even here.</li>
-            <li className="flex gap-3"><Tick /> At the end you get a plain explanation, not a diagnosis.</li>
+            <li className="flex gap-3">
+              <Tick />
+              <span>Answer for a typical <em>bad</em> week, not today.</span>
+            </li>
+            <li className="flex gap-3">
+              <Tick />
+              <span>
+                Your answers are worked out in this browser and are never sent, saved or
+                stored &mdash; not even here.
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <Tick />
+              <span>At the end you get a plain explanation, not a diagnosis.</span>
+            </li>
           </ul>
           <button
             type="button"
@@ -355,7 +364,7 @@ function SeverityQuestion({
         {question}
       </Legend>
       {aside ? (
-        <p className="mt-4 font-[family-name:var(--font-hand)] text-[1.15rem] leading-relaxed text-[var(--bloom-ink)]">
+        <p className="ori-hand mt-4 text-[1rem] text-[var(--bloom-ink)]">
           {aside}
         </p>
       ) : null}

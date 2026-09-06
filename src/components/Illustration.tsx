@@ -18,6 +18,7 @@ export function Illustration({
   caption,
   className,
   priority = false,
+  reveal = false,
   /** Rendered width hint for the responsive srcset. */
   sizes = "(max-width: 60rem) 88vw, 22rem",
 }: {
@@ -28,10 +29,15 @@ export function Illustration({
   caption?: string;
   className?: string;
   priority?: boolean;
+  /** Settle it in on arrival. Never on anything above the fold. */
+  reveal?: boolean;
   sizes?: string;
 }) {
   return (
-    <figure className={`ori-figure ${className ?? ""}`}>
+    <figure
+      className={`ori-figure ${className ?? ""}`}
+      data-reveal={reveal ? "figure" : undefined}
+    >
       <div className="ori-plate">
         <Image
           src={`/illustrations/${src}`}

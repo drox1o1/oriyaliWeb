@@ -57,7 +57,7 @@ export function Waitlist() {
     return (
       <div className="ori-paper-card px-6 py-9 text-center">
         <Butterfly className="mx-auto h-12 w-14 text-ink" />
-        <p className="mt-4 font-[family-name:var(--font-hand)] text-[1.5rem] leading-snug text-ink">
+        <p className="ori-hand mt-4 text-[1.25rem] text-ink">
           You&rsquo;re in.
         </p>
         <p className="mx-auto mt-2 max-w-[30rem] text-[1rem] leading-relaxed text-ink-soft">

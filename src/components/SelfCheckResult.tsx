@@ -41,7 +41,7 @@ export function SelfCheckResult({ result, cyclical, flaggedSafety, onRestart }: 
           Your answers, read back to you
         </p>
 
-        <h3 className="mt-3 max-w-[24ch] font-[family-name:var(--font-hand)] text-[1.75rem] leading-[1.25] text-ink md:text-[2.15rem]">
+        <h3 className="ori-hand mt-3 max-w-[24ch] text-[1.5rem] text-ink md:text-[1.8rem]">
           {headline}
         </h3>
 

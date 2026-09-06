@@ -17,8 +17,14 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         <hr className="ori-rule mt-8 border-t-2 border-[var(--ink)]" />
       </>
     ),
+    /* Only the headings settle in on a written page. Revealing every
+       paragraph of an essay turns reading it into a performance, and this
+       audience is often reading it with brain fog. */
     h2: ({ children }) => (
-      <h2 className="ori-headline mt-16 border-t border-[var(--hairline)] pt-7 text-ink">
+      <h2
+        className="ori-subtitle mt-16 border-t border-[var(--hairline)] pt-7 text-ink"
+        data-reveal="rise"
+      >
         {children}
       </h2>
     ),
@@ -41,8 +47,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     em: ({ children }) => <em className="italic">{children}</em>,
     hr: () => <hr className="ori-rule my-14" />,
     blockquote: ({ children }) => (
-      <figure className="my-10 md:-ml-[calc(11rem+clamp(1.25rem,2.6vw,2.75rem))] md:pr-12">
-        <div className="border-t-2 border-[var(--ink)] pt-5">
+      <figure className="ori-pullquote-hang my-10">
+        <hr className="ori-quote-rule" data-reveal="line" />
+        <div className="pt-5">
           <blockquote className="ori-pullquote">{children}</blockquote>
         </div>
       </figure>

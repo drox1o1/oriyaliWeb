@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
-import { BotanicalAura } from "@/components/BotanicalAura";
+import { DayPattern } from "@/components/DayPattern";
 
 const MOOD_WORDS = ["Flat", "Low", "Heavy", "Getting there", "Steady", "Clear"];
 const ENERGY_WORDS = ["Empty", "Running low", "Enough", "Steady", "Full"];
@@ -20,8 +20,8 @@ const word = (list: string[], v: number) =>
  * A taste of the daily check-in.
  *
  * Three sliders, and the aura draws itself in response. The point is felt, not
- * argued: a hard day renders as a deep, stormy, dignified bloom — as carefully
- * drawn as a calm one. A bad day is a real, coloured day, not a shameful spike.
+ * argued: every combination becomes a considered little print of the day.
+ * There is no ideal pattern to achieve, and no score hidden in the drawing.
  *
  * Nothing here is submitted, stored or counted.
  */
@@ -76,38 +76,46 @@ export function AuraTaste() {
   const hard = mood < 0.42 || edge > 0.62;
 
   return (
-    <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:items-center md:gap-14">
+    <div className="checkin-experience grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-center lg:gap-14">
       {/* The drawing */}
       <div className="aura-studio">
-        <BotanicalAura input={drawn} />
-        <p className="mt-6 text-center font-[family-name:var(--font-hand)] text-[1.25rem] leading-snug text-ink">
+        <DayPattern input={drawn} />
+        <p className="ori-hand mt-6 text-center text-[1.05rem] text-ink">
           {hard
             ? "This is what a hard day looks like here."
             : "This is what a steadier day looks like here."}
         </p>
         <p aria-live="polite" className="sr-only">
-          {`A coloured-pencil flower: ${energy < 0.35 ? "gently folded" : energy > 0.7 ? "fully open" : "opening"} petals, ${mood < 0.5 ? "soft mauve and blush" : "warm rose and apricot"} colour, and ${edge > 0.6 ? "a slightly restless" : "a quiet"} pencil flicker.`}
+          {`A printed circle of hand-drawn marks: ${
+            energy < 0.2
+              ? "falling raindrops"
+              : energy < 0.4
+                ? "round seeds"
+                : energy < 0.6
+                  ? "small shoots"
+                  : energy < 0.8
+                    ? "pointed leaves"
+                    : "open flowers"
+          }, printed in ${
+            mood < 0.35 ? "deep blue on cool grey" : mood > 0.7 ? "yellow-green on deep leaf" : "teal on soft green"
+          }, ${edge > 0.6 ? "turned at broad angles with a restless, undulating edge" : "upright in a quiet, even rhythm"}.`}
         </p>
       </div>
 
       {/* The controls */}
       <div>
-        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-ink-soft">
-          Try it — thirty seconds
-        </p>
-        <h3 className="mt-3 font-[family-name:var(--font-display)] text-[1.75rem] leading-[1.18] text-ink md:text-[2.1rem]">
-          Move these, and watch the day get drawn.
-        </h3>
+        <p className="ori-kicker">Move these</p>
         <p className="mt-4 text-[1.02rem] leading-relaxed text-ink-soft">
-          This is the check-in from the app, running here in your browser.
-          Nothing is submitted, saved or counted.
+          Energy changes what the marks are &mdash; rain, seeds, shoots, leaves,
+          flowers. Mood changes the colour they&rsquo;re printed in. Irritability
+          changes the rhythm they fall into.
         </p>
 
         <div className="aura-presets" aria-label="Try a day">
           {[
-            { name: "A quiet day", m: 0.78, e: 0.6, t: 0.16 },
-            { name: "A full day", m: 0.9, e: 0.96, t: 0.3 },
-            { name: "A hard day", m: 0.24, e: 0.28, t: 0.85 },
+            { name: "A quiet day", m: 0.74, e: 0.58, t: 0.14 },
+            { name: "A full day", m: 0.9, e: 0.96, t: 0.28 },
+            { name: "A hard day", m: 0.22, e: 0.12, t: 0.85 },
           ].map((p) => (
             <button
               type="button"
@@ -157,8 +165,11 @@ export function AuraTaste() {
           />
         </div>
 
-        <p className="mt-8 font-[family-name:var(--font-hand)] text-[1.1rem] leading-relaxed text-[var(--bloom-ink)]">
+        <p className="ori-hand mt-8 text-[1rem] text-[var(--bloom-ink)]">
           A bad day still gets a beautiful drawing. That&rsquo;s deliberate.
+        </p>
+        <p className="mt-4 text-[0.86rem] text-ink-soft">
+          Nothing here is submitted, saved or counted.
         </p>
       </div>
     </div>

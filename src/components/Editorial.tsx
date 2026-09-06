@@ -7,6 +7,57 @@ import type { ReactNode } from "react";
  */
 
 /**
+ * A movement opener.
+ *
+ * The page is one argument in three parts — why this exists, what is actually
+ * happening, and how you get someone to believe you — and this is the beat
+ * between them. One word, written very large, and one line under it.
+ *
+ * It carries no navigation and no numeral. It is a breath: the place where a
+ * reader who has been going for a while is told, plainly, where they are and
+ * what the next stretch is for.
+ */
+export function Movement({
+  n,
+  word,
+  line,
+  id,
+}: {
+  /** One, two, three — spelled out, because it is read, not counted. */
+  n: string;
+  word: string;
+  line: ReactNode;
+  id?: string;
+}) {
+  return (
+    <section id={id} className="ori-movement">
+      <div className="ori-grid">
+        <div className="col-wide">
+          <hr className="ori-movement__rule" data-reveal="line" />
+          <p className="ori-kicker mt-6" data-reveal="fade">
+            Part {n}
+          </p>
+          <h2
+            className="ori-movement__word"
+            data-reveal="rise"
+            style={{ "--reveal-delay": "90ms" } as React.CSSProperties}
+          >
+            {word}
+          </h2>
+          <p
+            className="ori-movement__line"
+            data-reveal="rise"
+            style={{ "--reveal-delay": "220ms" } as React.CSSProperties}
+          >
+            {line}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
  * A department opener: the numeral and its label in the rail, the headline
  * and deck in the body, ruled off with a hairline.
  */
@@ -25,7 +76,10 @@ export function SectionHead({
 }) {
   return (
     <>
-      <div className="col-rail mb-6 flex items-baseline gap-4 md:mb-0 md:block">
+      <div
+        className="col-rail mb-6 flex items-baseline gap-4 md:mb-0 md:block"
+        data-reveal="rise"
+      >
         <p className="ori-numeral" aria-hidden="true">
           {n}
         </p>
@@ -33,11 +87,21 @@ export function SectionHead({
       </div>
 
       <div className="col-main">
-        <div className="ori-folio mb-7" aria-hidden="true" />
-        <h2 id={id} className="ori-headline text-ink">
+        {/* The rule draws itself first, then the headline settles under it —
+            the order a page is actually ruled up and set. */}
+        <div className="ori-folio mb-7" aria-hidden="true" data-reveal="line" />
+        <h2 id={id} className="ori-headline text-ink" data-reveal="rise" style={{ "--reveal-delay": "120ms" } as React.CSSProperties}>
           {title}
         </h2>
-        {deck ? <p className="ori-deck mt-5 max-w-[38rem] text-balance">{deck}</p> : null}
+        {deck ? (
+          <p
+            className="ori-deck mt-5 max-w-[38rem] text-balance"
+            data-reveal="rise"
+            style={{ "--reveal-delay": "210ms" } as React.CSSProperties}
+          >
+            {deck}
+          </p>
+        ) : null}
       </div>
     </>
   );
@@ -59,12 +123,9 @@ export function Sidenote({
 }) {
   return (
     <aside
-      className={`ori-sidenote ${className ?? ""}`}
-      style={
-        hand
-          ? { fontFamily: "var(--font-hand)", color: "var(--bloom-ink)", fontSize: "1rem", lineHeight: 1.55 }
-          : undefined
-      }
+      className={`ori-sidenote ${hand ? "ori-hand" : ""} ${className ?? ""}`}
+      data-reveal="fade"
+      style={hand ? { color: "var(--bloom-ink)" } : undefined}
     >
       {children}
     </aside>
@@ -77,9 +138,18 @@ export function Sidenote({
  */
 export function PullQuote({ children, cite }: { children: ReactNode; cite?: string }) {
   return (
-    <figure className="my-10 md:-ml-[calc(11rem+clamp(1.25rem,2.6vw,2.75rem))] md:pr-10">
-      <div className="border-t-2 border-[var(--ink)] pt-5">
-        <blockquote className="ori-pullquote">{children}</blockquote>
+    <figure className="ori-pullquote-hang my-10">
+      {/* The rule is its own element so it can draw itself without taking the
+          quote with it. */}
+      <hr className="ori-quote-rule" data-reveal="line" />
+      <div className="pt-5">
+        <blockquote
+          className="ori-pullquote"
+          data-reveal="rise"
+          style={{ "--reveal-delay": "160ms" } as React.CSSProperties}
+        >
+          {children}
+        </blockquote>
         {cite ? <figcaption className="ori-kicker mt-4">{cite}</figcaption> : null}
       </div>
     </figure>

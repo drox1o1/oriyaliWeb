@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Newsreader, Hanken_Grotesk, Shantell_Sans } from "next/font/google";
+import { Newsreader, Hanken_Grotesk, Over_the_Rainbow } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
@@ -39,13 +39,18 @@ const hanken = Hanken_Grotesk({
   preload: true,
 });
 
-const shantell = Shantell_Sans({
+/* The hand. Over the Rainbow is a genuine handwriting face — thin strokes and
+   a small x-height — so it is never used at body size and never carries
+   clinical content. `.ori-hand` in the token layer does the optical
+   compensation; nothing should set this variable directly. */
+const rainbow = Over_the_Rainbow({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-shantell",
+  variable: "--font-rainbow",
   weight: ["400"],
-  // The hand is seasoning, not the meal. It can arrive a moment late.
-  preload: false,
+  // The wordmark is set in it, and the wordmark is in the masthead, so unlike
+  // the old hand this one is on the critical path.
+  preload: true,
 });
 
 const SITE = "https://oriyali.com";
@@ -95,28 +100,27 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-/* Applies a saved theme choice before first paint, so the page never flashes.
-   Reads only a light/dark preference. Nothing else is stored, ever. */
-const themeScript = `(function(){try{var t=localStorage.getItem("oriyali-theme");if(t==="dark"||t==="light"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}})();`;
-
+/**
+ * Light or twilight follows the device, and only the device.
+ *
+ * There is no switch and nothing is remembered: a visitor who keeps their
+ * phone on twilight after dark gets the lamp-turned-low register without
+ * asking, and this site stores nothing at all in their browser.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
-      suppressHydrationWarning
-      className={`${newsreader.variable} ${newsreaderItalic.variable} ${hanken.variable} ${shantell.variable}`}
+      className={`${newsreader.variable} ${newsreaderItalic.variable} ${hanken.variable} ${rainbow.variable}`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body>
         <a href="#main" className="ori-skip">
           Skip to the main content
         </a>
         <PageMotion>
-        <SiteHeader />
-        <main id="main">{children}</main>
-        <SiteFooter />
+          <SiteHeader />
+          <main id="main">{children}</main>
+          <SiteFooter />
         </PageMotion>
       </body>
     </html>
