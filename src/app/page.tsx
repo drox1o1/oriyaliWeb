@@ -71,10 +71,12 @@ export default function Home() {
         </div>
 
         <div className="col-aside self-start md:-mt-6" data-reveal="figure">
-          <BotanicalAura
-            input={RESTING_AURA}
-            className="mx-auto block h-56 w-56 sm:h-72 sm:w-72 md:mx-0 md:h-auto md:w-full"
-          />
+          <div data-parallax="figure">
+            <BotanicalAura
+              input={RESTING_AURA}
+              className="mx-auto block h-56 w-56 sm:h-72 sm:w-72 md:mx-0 md:h-auto md:w-full"
+            />
+          </div>
         </div>
       </section>
 
@@ -213,7 +215,9 @@ export default function Home() {
         />
 
         <div className="col-body self-center" data-reveal="figure">
-          <RecordSketch variant="journal" />
+          <div data-parallax="figure">
+            <RecordSketch variant="journal" />
+          </div>
         </div>
 
         <Reveal className="col-wide mt-2" variant="figure">

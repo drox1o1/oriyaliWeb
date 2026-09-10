@@ -1763,3 +1763,78 @@ body::before {
   color: var(--ink-soft);
   text-wrap: pretty;
 }
+
+/* ============================================================
+   DEPTH
+
+   Parallax, in the register the rest of the page is written in:
+   slow, small, and ignorable. Nothing travels far. The point is
+   not that the reader notices layers moving — it is that the
+   page stops feeling like flat paper and starts feeling like it
+   has air in it.
+
+   Markup opts in with `data-parallax="<preset>"`; the driver in
+   PageMotion writes `--px-y` (and `--px-x` for the pointer).
+   Because the *variables* carry the movement and default to
+   zero, server-rendered HTML sits exactly where it was designed
+   to, and a page with no script never moves at all.
+
+   Presets, slowest-moving (furthest away) first:
+     sky     a full-bleed backdrop, pre-scaled so it has room to
+             travel without showing its edges
+     figure  a drawing, drifting a little behind its text
+     quiet   a whisper, for asides and rules
+     near    the only one that moves *with* you, for foreground
+   ============================================================ */
+
+[data-parallax],
+[data-pointer-drift] {
+  --px-y: 0px;
+  --px-x: 0px;
+  --px-scale: 1;
+  transform: translate3d(var(--px-x), var(--px-y), 0) scale(var(--px-scale));
+}
+
+/* A backdrop is scaled up so that when it drifts, its edges never
+   walk into frame. The driver reads this same number, so the two
+   can never disagree about how much headroom there is. */
+[data-parallax="sky"] { --px-scale: 1.24; }
+
+/* Measuring flag. `getBoundingClientRect` reports the box *after*
+   transform, so a scaled backdrop measures 1.24× its real height and
+   the driver would grant it 1.24× the headroom it actually has — and
+   an edge walks into frame. The driver sets this for one synchronous
+   pass so it reads layout, not the picture of it. */
+[data-parallax][data-px-measuring] { transform: none !important; }
+
+/* The pointer moves the sky by a few pixels and nothing else. It
+   is a parallax of the head, not the page: you notice it when you
+   lean in, and never otherwise.
+
+   It sits on its own element, wrapping the scroll layer rather than
+   sharing it. Two drivers writing one transform would fight, and the
+   easing that makes the pointer feel unhurried would make the scroll
+   parallax lag a frame behind the thumb. */
+[data-pointer-drift] {
+  transition: transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: transform;
+}
+
+/* Both switches land the page flat — by zeroing the travel, not the
+   whole transform. A backdrop keeps its scale either way, so turning
+   motion off changes what moves and never what is framed. */
+:root[data-motion="off"] [data-parallax],
+:root[data-motion="off"] [data-pointer-drift] {
+  --px-y: 0px !important;
+  --px-x: 0px !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-parallax],
+  [data-pointer-drift] {
+    --px-y: 0px !important;
+    --px-x: 0px !important;
+    transition: none !important;
+  }
+}

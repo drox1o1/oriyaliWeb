@@ -22,14 +22,17 @@ export function SiteFooter() {
     <footer className="site-footer mt-24">
       {/* The closing image, full width and full height. */}
       <div className="site-footer__plate">
-        <Image
-          src="/illustrations/footer.png"
-          alt=""
-          fill
-          quality={78}
-          sizes="100vw"
-          className="-z-10 object-cover object-[38%_center] md:object-center"
-        />
+        <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
+          <Image
+            src="/illustrations/footer.png"
+            alt=""
+            fill
+            quality={78}
+            sizes="100vw"
+            data-parallax="sky"
+            className="object-cover object-[38%_center] md:object-center"
+          />
+        </div>
 
         <div className="ori-grid w-full py-12 md:py-16">
           <div className="col-wide md:col-[rail-start/body-end]">

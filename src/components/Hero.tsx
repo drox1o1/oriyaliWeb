@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const IMAGE = "-z-20 object-cover object-[68%_center] md:object-[center_38%]";
+const IMAGE = "object-cover object-[68%_center] md:object-[center_38%]";
 
 /**
  * The full-screen opening.
@@ -24,27 +24,40 @@ export function Hero() {
       data-hero
       className="ori-under-masthead relative isolate flex min-h-[100svh] items-start overflow-hidden"
     >
-      <Image
-        src="/illustrations/header.png"
-        alt=""
-        fill
-        priority
-        quality={78}
-        sizes="100vw"
-        className={`hero-day ${IMAGE}`}
-      />
-      <Image
-        src="/illustrations/header-dark.png"
-        alt=""
-        fill
-        /* Both skies are prioritised: which one is visible depends on the
-           theme, which the server cannot know, so preloading only one leaves
-           half of all visitors waiting on a lazy hero. */
-        priority
-        quality={78}
-        sizes="100vw"
-        className={`hero-night ${IMAGE}`}
-      />
+      {/* Two layers of depth, on two elements. The outer one answers the
+          pointer and eases; the inner one answers the scroll and does not,
+          because easing the scroll would put the sky a frame behind the
+          thumb. Sharing one element would have them fighting over the same
+          transform. */}
+      <div
+        aria-hidden="true"
+        data-pointer-drift="10"
+        className="absolute inset-0 -z-20 overflow-hidden"
+      >
+        <Image
+          src="/illustrations/header.png"
+          alt=""
+          fill
+          priority
+          quality={78}
+          sizes="100vw"
+          data-parallax="sky"
+          className={`hero-day ${IMAGE}`}
+        />
+        <Image
+          src="/illustrations/header-dark.png"
+          alt=""
+          fill
+          /* Both skies are prioritised: which one is visible depends on the
+             theme, which the server cannot know, so preloading only one leaves
+             half of all visitors waiting on a lazy hero. */
+          priority
+          quality={78}
+          sizes="100vw"
+          data-parallax="sky"
+          className={`hero-night ${IMAGE}`}
+        />
+      </div>
 
       <div
         aria-hidden="true"
@@ -61,6 +74,7 @@ export function Hero() {
 
       <div className="ori-grid w-full pb-[clamp(4rem,14vh,8rem)] pt-[calc(var(--masthead)+clamp(2rem,8vh,5rem))]">
         <div
+          data-parallax="quiet"
           className="col-wide md:col-[rail-start/body-end]"
           style={{ color: "var(--hero-ink)" }}
         >

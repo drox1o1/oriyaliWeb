@@ -110,6 +110,205 @@ export function PageMotion({ children }: { children: ReactNode }) {
     };
   }, [pathname, paused, quiet]);
 
+  /* ------------------------------------------------------------
+     Depth.
+
+     One listener, one frame loop, one write per element per frame.
+     Geometry is measured once and cached, so scrolling never reads
+     layout — the frame does arithmetic and sets a custom property,
+     which is the cheapest thing a scroll handler can do.
+
+     Movement is measured from the viewport's centre line, so every
+     element sits exactly where it was designed to when it is the
+     thing you are looking at, and drifts only on the way in and out.
+     ------------------------------------------------------------ */
+  useEffect(() => {
+    const scope = root.current;
+    if (!scope || paused || quiet) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    /* Furthest-moving first, which is to say furthest away.
+
+       `scale` is the headroom a full-bleed layer is given so it can
+       travel without showing its edge; it matches the same number in
+       the stylesheet, and such a layer takes its limit from that
+       overhang rather than from `max`.
+
+       `max` is how far anything else may drift. These are small on
+       purpose: the point is that the margins of the page are not
+       quite on the same plane as the column you are reading, not
+       that anything performs. A negative speed leads the scroll,
+       which reads as nearer to you. */
+    const PRESETS: Record<string, { speed: number; scale: number; max: number }> = {
+      sky: { speed: 0.16, scale: 1.24, max: 0 },
+      figure: { speed: 0.075, scale: 1, max: 40 },
+      // A note in the hand is loose on the page and may float. A footnote
+      // is set to the column beside it and may not: it is held to a drift
+      // small enough that the alignment still reads.
+      note: { speed: 0.06, scale: 1, max: 32 },
+      rail: { speed: 0.03, scale: 1, max: 18 },
+      quiet: { speed: 0.04, scale: 1, max: 24 },
+      near: { speed: -0.05, scale: 1, max: 30 },
+    };
+
+    type Layer = { el: HTMLElement; speed: number; max: number; centre: number };
+
+    let layers: Layer[] = [];
+    let viewportH = window.innerHeight;
+    let frame = 0;
+
+    const paint = () => {
+      const middle = window.scrollY + viewportH / 2;
+      for (const layer of layers) {
+        const delta = layer.centre - middle;
+        // Beyond a viewport and a bit either way it cannot be seen, so
+        // stop asking the compositor to keep a layer for it.
+        if (Math.abs(delta) > viewportH * 1.3) {
+          if (layer.el.style.willChange) layer.el.style.willChange = "";
+          continue;
+        }
+        const travel = Math.max(-layer.max, Math.min(layer.max, -delta * layer.speed));
+        layer.el.style.setProperty("--px-y", `${travel.toFixed(2)}px`);
+        if (!layer.el.style.willChange) layer.el.style.willChange = "transform";
+      }
+    };
+
+    const measure = () => {
+      viewportH = window.innerHeight;
+      // Small screens get a gentler version of the same idea: less room
+      // to travel, and a hand usually closer to the glass.
+      const amplitude = window.innerWidth < 768 ? 0.55 : 1;
+      const scrolled = window.scrollY;
+
+      const nodes = Array.from(scope.querySelectorAll<HTMLElement>("[data-parallax]"));
+
+      // Read layout, not the transformed picture of it. One flag, one
+      // synchronous pass, one reflow — and only when something has
+      // actually changed size.
+      nodes.forEach((el) => el.setAttribute("data-px-measuring", ""));
+
+      layers = nodes.map(
+        (el) => {
+          const preset = PRESETS[el.dataset.parallax ?? ""] ?? PRESETS.quiet;
+          const box = el.getBoundingClientRect();
+          return {
+            el,
+            speed: preset.speed * amplitude,
+            // A scaled backdrop may travel only as far as its own overhang,
+            // less a little, so an edge can never walk into frame. Anything
+            // else is held to a distance that reads as depth, not drift.
+            max:
+              preset.scale > 1
+                ? ((box.height * (preset.scale - 1)) / 2) * 0.88
+                : preset.max * amplitude,
+            centre: box.top + scrolled + box.height / 2,
+          };
+        },
+      );
+
+      nodes.forEach((el) => el.removeAttribute("data-px-measuring"));
+      paint();
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        paint();
+      });
+    };
+
+    // Anything that changes the height of the page moves every centre
+    // line below it, so re-measure rather than drift out of true.
+    let settle = 0;
+    const remeasure = () => {
+      window.clearTimeout(settle);
+      settle = window.setTimeout(measure, 120);
+    };
+
+    measure();
+    void document.fonts?.ready.then(measure);
+
+    const resizeObserver = new ResizeObserver(remeasure);
+    resizeObserver.observe(document.body);
+
+    // The hero keeps two skies and shows whichever suits the hour. The one
+    // that was hidden when we measured has no size to remember, so when the
+    // hour turns it needs measuring again before it can travel.
+    const scheme = window.matchMedia("(prefers-color-scheme: dark)");
+    scheme.addEventListener("change", remeasure);
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", remeasure);
+    window.addEventListener("orientationchange", remeasure);
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.clearTimeout(settle);
+      resizeObserver.disconnect();
+      scheme.removeEventListener("change", remeasure);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", remeasure);
+      window.removeEventListener("orientationchange", remeasure);
+      layers.forEach(({ el }) => {
+        el.style.removeProperty("--px-y");
+        el.style.willChange = "";
+      });
+    };
+  }, [pathname, paused, quiet]);
+
+  /* ------------------------------------------------------------
+     The pointer.
+
+     A few pixels of sky under the cursor — a parallax of the head
+     rather than of the page. Only where there is a real pointer:
+     on a touch screen there is nothing hovering to answer, and the
+     handler would only cost battery.
+     ------------------------------------------------------------ */
+  useEffect(() => {
+    const scope = root.current;
+    if (!scope || paused || quiet) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    const targets = Array.from(
+      scope.querySelectorAll<HTMLElement>("[data-pointer-drift]"),
+    );
+    if (!targets.length) return;
+
+    let frame = 0;
+    let pointerX = 0.5;
+    let pointerY = 0.5;
+
+    const paint = () => {
+      frame = 0;
+      // ±1 either side of centre, then a handful of pixels of it.
+      const x = (pointerX - 0.5) * 2;
+      const y = (pointerY - 0.5) * 2;
+      for (const el of targets) {
+        const reach = Number(el.dataset.pointerDrift) || 8;
+        el.style.setProperty("--px-x", `${(-x * reach).toFixed(2)}px`);
+        el.style.setProperty("--px-y", `${(-y * reach * 0.5).toFixed(2)}px`);
+      }
+    };
+
+    const onMove = (event: PointerEvent) => {
+      pointerX = event.clientX / window.innerWidth;
+      pointerY = event.clientY / window.innerHeight;
+      if (!frame) frame = requestAnimationFrame(paint);
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("pointermove", onMove);
+      targets.forEach((el) => {
+        el.style.removeProperty("--px-x");
+        el.style.removeProperty("--px-y");
+      });
+    };
+  }, [pathname, paused, quiet]);
+
   useEffect(() => {
     const drawings = root.current?.querySelectorAll(
       ".pencil-bloom, .pencil-landscape",
@@ -140,6 +339,9 @@ export function PageMotion({ children }: { children: ReactNode }) {
         <button
           type="button"
           className="motion-toggle"
+          // Below 960px the stylesheet hides the label, and the icon is
+          // decorative — so the name has to be said here as well as shown.
+          aria-label={paused ? "Motion paused. Resume motion" : "Pause motion"}
           aria-pressed={paused}
           onClick={() => setPaused(!paused)}
         >

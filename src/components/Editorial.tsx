@@ -32,7 +32,9 @@ export function Movement({
   return (
     <section id={id} className="ori-movement">
       <div className="ori-grid">
-        <div className="col-wide">
+        {/* The breath between parts sits a little behind the page, so the
+            word drifts up through its own white space as you reach it. */}
+        <div className="col-wide" data-parallax="quiet">
           <hr className="ori-movement__rule" data-reveal="line" />
           <p className="ori-kicker mt-6" data-reveal="fade">
             Part {n}
@@ -76,14 +78,19 @@ export function SectionHead({
 }) {
   return (
     <>
-      <div
-        className="col-rail mb-6 flex items-baseline gap-4 md:mb-0 md:block"
-        data-reveal="rise"
-      >
-        <p className="ori-numeral" aria-hidden="true">
-          {n}
-        </p>
-        <p className="ori-kicker mt-2 md:mt-3">{kicker}</p>
+      {/* Two elements, because the reveal and the drift both animate
+          `transform` and neither should be holding the other's. The outer
+          one carries the depth; the inner one arrives. */}
+      <div className="col-rail" data-parallax="rail">
+        <div
+          className="mb-6 flex items-baseline gap-4 md:mb-0 md:block"
+          data-reveal="rise"
+        >
+          <p className="ori-numeral" aria-hidden="true">
+            {n}
+          </p>
+          <p className="ori-kicker mt-2 md:mt-3">{kicker}</p>
+        </div>
       </div>
 
       <div className="col-main">
@@ -122,12 +129,15 @@ export function Sidenote({
   className?: string;
 }) {
   return (
+    // The grid classes stay on the `aside` itself — the stylesheet asks for
+    // `.ori-sidenote.col-rail` on one element — so the drift goes here and
+    // the reveal goes on a wrapper inside it.
     <aside
       className={`ori-sidenote ${hand ? "ori-hand" : ""} ${className ?? ""}`}
-      data-reveal="fade"
+      data-parallax={hand ? "note" : "rail"}
       style={hand ? { color: "var(--bloom-ink)" } : undefined}
     >
-      {children}
+      <div data-reveal="fade">{children}</div>
     </aside>
   );
 }
