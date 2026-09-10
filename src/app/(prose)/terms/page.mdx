@@ -1,7 +1,31 @@
 export const metadata = {
   title: "Terms",
-  description: "The short, readable terms for using this website.",
+  description:
+    "The short, readable terms for using this website. Educational only — not a medical device, and not a diagnosis.",
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    type: "article",
+    url: "/terms",
+    title: "The short, readable terms",
+    description:
+      "Educational only. Not a medical device, not medical advice, and not a diagnosis.",
+  },
+  twitter: {
+    title: "The short, readable terms",
+    description:
+      "Educational only. Not a medical device, not medical advice, and not a diagnosis.",
+  },
 };
+
+import { ArticleStructuredData } from "@/components/StructuredData";
+
+<ArticleStructuredData
+  path="/terms"
+  headline="Terms"
+  description="The short, readable terms for using this website. Educational only — not a medical device, and not a diagnosis."
+  published="2026-09-04"
+  modified="2026-09-06"
+/>
 
 # Terms
 

@@ -9,7 +9,7 @@ import { Movement, PullQuote, SectionHead, Sidenote } from "@/components/Editori
 import { Reveal } from "@/components/motion/Reveal";
 import { HandUnderline } from "@/components/Illustrations";
 import { RESTING_AURA } from "@/lib/aura";
-import { StructuredData } from "@/components/StructuredData";
+import { HomeStructuredData } from "@/components/StructuredData";
 import { Hero } from "@/components/Hero";
 import { RecordSketch } from "@/components/RecordSketch";
 
@@ -29,7 +29,7 @@ import { RecordSketch } from "@/components/RecordSketch";
 export default function Home() {
   return (
     <>
-      <StructuredData />
+      <HomeStructuredData />
       <Hero />
 
       {/* ═══ PART ONE ═══════════════════════════════════════ */}

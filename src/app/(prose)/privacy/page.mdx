@@ -2,7 +2,30 @@ export const metadata = {
   title: "Privacy",
   description:
     "The plain-English version first, then the real policy. Nothing you type into the self-check or the aura demo ever leaves your device.",
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    type: "article",
+    url: "/privacy",
+    title: "Nothing you type here leaves your device",
+    description:
+      "No analytics, no advertising pixels, no session recording. Not gated behind a banner — simply not here.",
+  },
+  twitter: {
+    title: "Nothing you type here leaves your device",
+    description:
+      "No analytics, no advertising pixels, no session recording. Not gated behind a banner — simply not here.",
+  },
 };
+
+import { ArticleStructuredData } from "@/components/StructuredData";
+
+<ArticleStructuredData
+  path="/privacy"
+  headline="Privacy"
+  description="Nothing you type into the self-check or the aura demo ever leaves your device. No analytics, no advertising pixels, no session recording."
+  published="2026-09-04"
+  modified="2026-09-06"
+/>
 
 # Privacy
 

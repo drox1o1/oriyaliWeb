@@ -12,6 +12,15 @@ const scriptSrc = isDev
 const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "mdx"],
   poweredByHeader: false,
+
+  /* The share cards read their two typefaces off disk at build time. File
+     tracing cannot see a path built with `join()`, so it is named here — a
+     card rendered without them falls back to a system face and stops looking
+     like the site. */
+  outputFileTracingIncludes: {
+    "/**": ["./src/app/_og-fonts/**"],
+  },
+
   async headers() {
     return [
       {

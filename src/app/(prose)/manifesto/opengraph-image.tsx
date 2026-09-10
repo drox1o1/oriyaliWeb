@@ -1,15 +1,15 @@
 import { ImageResponse } from "next/og";
 import { CARD_CONTENT_TYPE, CARD_SIZE, shareCard } from "@/lib/og";
 
-export const alt =
-  "Oriyali — See your next hard week before it arrives. A private PMDD self-check that never leaves your device.";
+export const alt = "Oriyali — Why I’m building Oriyali";
 export const size = CARD_SIZE;
 export const contentType = CARD_CONTENT_TYPE;
 
 export default async function OpengraphImage() {
   const { element, options } = await shareCard({
-    title: "See your next hard week before it arrives.",
-    line: "A private place to work out whether that fortnight has a name — and an iPhone app that helps you prove it to a doctor.",
+    eyebrow: "Why Oriyali",
+    title: "Why I’m building Oriyali",
+    line: "A designer’s note about PMDD, medical gaslighting, and why the app most PMDD patients rely on deserves a better successor.",
   });
   return new ImageResponse(element, options);
 }

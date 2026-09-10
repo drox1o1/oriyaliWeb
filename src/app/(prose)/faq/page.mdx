@@ -1,8 +1,26 @@
 export const metadata = {
-  title: "Questions",
+  title: "Questions about PMDD, the PSST and the DRSP",
   description:
     "What PMDD is, how it differs from PMS, what the PSST and the DRSP are, whether any of this counts as a diagnosis, and how Oriyali handles your data.",
+  alternates: { canonical: "/faq" },
+  openGraph: {
+    type: "article",
+    url: "/faq",
+    title: "Questions",
+    description:
+      "What PMDD is, how it differs from PMS, what the PSST and the DRSP are, and whether any of this counts as a diagnosis.",
+  },
+  twitter: {
+    title: "Questions",
+    description:
+      "What PMDD is, how it differs from PMS, what the PSST and the DRSP are, and whether any of this counts as a diagnosis.",
+  },
 };
+
+import { FaqStructuredData } from "@/components/StructuredData";
+import { FAQ } from "@/lib/faq";
+
+<FaqStructuredData entries={FAQ} />
 
 # Questions
 

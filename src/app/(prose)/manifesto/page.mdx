@@ -4,7 +4,30 @@ export const metadata = {
   title: "Why I'm building Oriyali",
   description:
     "A designer's note about PMDD, medical gaslighting, and why the app most PMDD patients rely on deserves a better successor.",
+  alternates: { canonical: "/manifesto" },
+  openGraph: {
+    type: "article",
+    url: "/manifesto",
+    title: "Why I'm building Oriyali",
+    description:
+      "A designer's note about PMDD, medical gaslighting, and why the app most PMDD patients rely on deserves a better successor.",
+  },
+  twitter: {
+    title: "Why I'm building Oriyali",
+    description:
+      "A designer's note about PMDD, medical gaslighting, and why the app most PMDD patients rely on deserves a better successor.",
+  },
 };
+
+import { ArticleStructuredData } from "@/components/StructuredData";
+
+<ArticleStructuredData
+  path="/manifesto"
+  headline="Why I'm building Oriyali"
+  description="A designer's note about PMDD, medical gaslighting, and why the app most PMDD patients rely on deserves a better successor."
+  published="2026-09-04"
+  modified="2026-09-06"
+/>
 
 # Why I&rsquo;m building Oriyali
 
